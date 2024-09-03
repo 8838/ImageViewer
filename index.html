@@ -9,12 +9,21 @@
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
+        }
+        #imageViewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            z-index: 1000;
         }
         #mediaContainer {
+            position: relative;
             max-width: 90%;
             max-height: 90vh;
         }
@@ -23,19 +32,55 @@
             max-height: 100%;
             object-fit: contain;
         }
+        #closeButton {
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <div id="mediaContainer"></div>
+    <div id="imageViewer" style="display: none;">
+        <div id="mediaContainer">
+            <div id="closeButton">×</div>
+            <img id="viewerImage" src="" alt="Viewer Image">
+        </div>
+    </div>
 
     <script>
-        const path = window.location.pathname;
-        const mediaUrl = `https://i.imgs.ovh${path}`;
+        document.addEventListener('DOMContentLoaded', function() {
+            const path = window.location.pathname;
+            const mediaUrl = `https://i.imgs.ovh${path}`;
+            const imageViewer = document.getElementById('imageViewer');
+            const viewerImage = document.getElementById('viewerImage');
+            const closeButton = document.getElementById('closeButton');
 
-        let imgElement = document.createElement('img');
-        imgElement.src = mediaUrl;
+            // 设置图片源并显示查看器
+            viewerImage.src = mediaUrl;
+            imageViewer.style.display = 'flex';
 
-        document.getElementById('mediaContainer').appendChild(imgElement);
+            // 关闭按钮功能
+            closeButton.addEventListener('click', function() {
+                imageViewer.style.display = 'none';
+            });
+
+            // 点击查看器背景也可以关闭
+            imageViewer.addEventListener('click', function(event) {
+                if (event.target === imageViewer) {
+                    imageViewer.style.display = 'none';
+                }
+            });
+        });
     </script>
 </body>
 </html>
