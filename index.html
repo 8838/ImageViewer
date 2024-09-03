@@ -3,112 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>优雅图片查看器</title>
+    <title>Image viewer</title>
     <style>
-        body, html {
+        body {
             margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
-            height: 100%;
+            font-family: Arial, sans-serif;
             background-color: #f0f0f0;
-        }
-        #imageViewer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            min-height: 100vh;
         }
         #mediaContainer {
-            position: relative;
             max-width: 90%;
             max-height: 90vh;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
         }
-        #viewerImage {
-            display: block;
+        #mediaContainer img {
             max-width: 100%;
-            max-height: 90vh;
+            max-height: 100%;
             object-fit: contain;
-        }
-        #closeButton {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 40px;
-            height: 40px;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            font-size: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        #closeButton:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-        }
-        #closeButton::before {
-            content: '×';
         }
     </style>
 </head>
 <body>
-    <div id="imageViewer">
-        <div id="mediaContainer">
-            <img id="viewerImage" src="" alt="查看的图片">
-            <button id="closeButton" aria-label="关闭查看器"></button>
-        </div>
-    </div>
+    <div id="mediaContainer"></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const path = window.location.pathname;
-            const mediaUrl = `https://i.imgs.ovh${path}`;
-            const imageViewer = document.getElementById('imageViewer');
-            const viewerImage = document.getElementById('viewerImage');
-            const closeButton = document.getElementById('closeButton');
+        const path = window.location.pathname;
+        const mediaUrl = `https://i.imgs.ovh${path}`;
 
-            // 设置图片源
-            viewerImage.src = mediaUrl;
+        let imgElement = document.createElement('img');
+        imgElement.src = mediaUrl;
 
-            // 关闭按钮功能
-            closeButton.addEventListener('click', closeViewer);
-
-            // 点击查看器背景也可以关闭
-            imageViewer.addEventListener('click', function(event) {
-                if (event.target === imageViewer) {
-                    closeViewer();
-                }
-            });
-
-            // 关闭查看器的函数
-            function closeViewer() {
-                imageViewer.style.opacity = '0';
-                setTimeout(() => {
-                    imageViewer.style.display = 'none';
-                    imageViewer.style.opacity = '1';
-                }, 300);
-            }
-
-            // 添加键盘事件监听
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape') {
-                    closeViewer();
-                }
-            });
-        });
+        document.getElementById('mediaContainer').appendChild(imgElement);
     </script>
 </body>
 </html>
