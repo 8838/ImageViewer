@@ -3,56 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image viewer</title>
-    <link rel="icon" href="logo.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.4/photoswipe.min.css">
+    <title>Beautiful Image Viewer</title>
     <style>
-        body {
+        body, html {
             margin: 0;
-            font-family: Arial, sans-serif;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f0f0;
+        }
+        #viewer {
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            background-color: rgba(0, 0, 0, 0.9);
+            position: relative;
         }
-        #mediaContainer {
+        #image-container {
             max-width: 90%;
-            max-height: 90vh;
-            cursor: pointer;
+            max-height: 90%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
         }
-        #mediaContainer img {
+        #image {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            transition: transform 0.3s ease;
+            cursor: move;
+        }
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: flex;
+            gap: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .control-btn {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 5px;
+        }
+        .control-btn:hover {
+            color: #00a8ff;
+        }
+        #zoom-level {
+            color: white;
+            font-size: 14px;
+            align-self: center;
+            min-width: 40px;
+            text-align: center;
+        }
+        #close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+        #close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.4);
         }
     </style>
 </head>
 <body>
-    <div id="mediaContainer"></div>
+    <div id="viewer">
+        <div id="image-container">
+            <img id="image" src="" alt="Viewed image">
+        </div>
+        <div id="controls">
+            <button id="zoomOut" class="control-btn">&#8722;</button>
+            <span id="zoom-level">100%</span>
+            <button id="zoomIn" class="control-btn">&#43;</button>
+            <button id="fullscreen" class="control-btn">&#x26F6;</button>
+        </div>
+        <button id="close-btn">&times;</button>
+    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.4/photoswipe.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.4/photoswipe-lightbox.umd.min.js"></script>
     <script>
+        const image = document.getElementById('image');
+        const viewer = document.getElementById('viewer');
+        const imageContainer = document.getElementById('image-container');
+        const zoomInBtn = document.getElementById('zoomIn');
+        const zoomOutBtn = document.getElementById('zoomOut');
+        const fullscreenBtn = document.getElementById('fullscreen');
+        const closeBtn = document.getElementById('close-btn');
+        const zoomLevelDisplay = document.getElementById('zoom-level');
+
+        // Set image source
         const path = window.location.pathname;
         const mediaUrl = `https://i.imgs.ovh${path}`;
-        
-        let imgElement = document.createElement('img');
-        imgElement.src = mediaUrl;
-        document.getElementById('mediaContainer').appendChild(imgElement);
+        image.src = mediaUrl;
 
-        // Initialize PhotoSwipe
-        const lightbox = new PhotoSwipeLightbox({
-            gallery: '#mediaContainer',
-            children: 'img',
-            pswpModule: PhotoSwipe
+        let scale = 1;
+        let isDragging = false;
+        let startX, startY, translateX = 0, translateY = 0;
+
+        function updateTransform() {
+            image.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+            zoomLevelDisplay.textContent = `${Math.round(scale * 100)}%`;
+        }
+
+        function zoom(delta) {
+            scale = Math.max(0.1, Math.min(scale + delta, 3));
+            updateTransform();
+        }
+
+        zoomInBtn.addEventListener('click', () => zoom(0.1));
+        zoomOutBtn.addEventListener('click', () => zoom(-0.1));
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                viewer.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
         });
 
-        lightbox.init();
+        closeBtn.addEventListener('click', () => {
+            // You can define what happens when the close button is clicked
+            // For example, you might want to hide the viewer or navigate away
+            alert('Close button clicked. Define your close behavior here.');
+        });
 
-        // Open PhotoSwipe on image click
-        imgElement.addEventListener('click', () => {
-            lightbox.loadAndOpen(0);
+        image.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            zoom(delta);
+        });
+
+        image.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX - translateX;
+            startY = e.clientY - translateY;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            translateX = e.clientX - startX;
+            translateY = e.clientY - startY;
+            updateTransform();
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        image.addEventListener('dblclick', () => {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            updateTransform();
         });
     </script>
 </body>
