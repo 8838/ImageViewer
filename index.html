@@ -36,21 +36,60 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
         #mediaContainer img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            display: none;
+        }
+        .loading {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <h1>Image viewer</h1>
-    <div id="mediaContainer"></div>
+    <div id="mediaContainer">
+        <div class="loading"></div>
+        <img id="lazyImage" alt="Image viewer">
+    </div>
     <script>
         const path = window.location.pathname;
         const mediaUrl = `https://i.imgs.ovh${path}`;
-        document.getElementById('mediaContainer').appendChild(Object.assign(document.createElement('img'), { src: mediaUrl }));
+        const imgElement = document.getElementById('lazyImage');
+        const loadingSpinner = document.querySelector('.loading');
+
+        // IntersectionObserver for lazy loading
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    imgElement.src = mediaUrl;
+                    imgElement.onload = () => {
+                        loadingSpinner.style.display = 'none';
+                        imgElement.style.display = 'block';
+                    };
+                    observer.unobserve(imgElement); // Stop observing once loaded
+                }
+            });
+        }, {
+            root: null, // relative to viewport
+            rootMargin: '0px',
+            threshold: 0.1 // trigger when 10% of the image is visible
+        });
+
+        observer.observe(imgElement);
     </script>
 </body>
 </html>
