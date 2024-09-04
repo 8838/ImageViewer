@@ -13,11 +13,26 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             min-height: 100vh;
+            overflow: hidden;
+        }
+        h1 {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+            font-size: 24px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 10;
         }
         #mediaContainer {
             max-width: 90%;
             max-height: 90vh;
+            margin-top: 60px; /* To create space for the title */
         }
         #mediaContainer img {
             max-width: 100%;
@@ -27,13 +42,12 @@
     </style>
 </head>
 <body>
+    <h1>Image viewer</h1>
     <div id="mediaContainer"></div>
     <script>
         const path = window.location.pathname;
-        const mediaUrl = https://i.imgs.ovh${path};
-        let imgElement = document.createElement('img');
-        imgElement.src = mediaUrl;
-        document.getElementById('mediaContainer').appendChild(imgElement);
+        const mediaUrl = `https://i.imgs.ovh${path}`;
+        document.getElementById('mediaContainer').appendChild(Object.assign(document.createElement('img'), { src: mediaUrl }));
     </script>
 </body>
 </html>
