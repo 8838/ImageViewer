@@ -130,13 +130,35 @@
             zoomLevelDisplay.textContent = `${Math.round(scale * 100)}%`;
         }
 
+        const zoomStep = 0.1;
+        const minZoom = 0.1;
+        const maxZoom = 3;
+
         function zoom(delta) {
-            scale = Math.max(0.1, Math.min(scale + delta, 3));
+            scale = Math.max(minZoom, Math.min(scale + delta, maxZoom));
             updateTransform();
         }
 
-        zoomInBtn.addEventListener('click', () => zoom(0.1));
-        zoomOutBtn.addEventListener('click', () => zoom(-0.1));
+        let zoomTimeout = null;
+
+        function handleZoom(delta) {
+            if (zoomTimeout) {
+                clearTimeout(zoomTimeout);
+            }
+            zoomTimeout = setTimeout(() => {
+                zoom(delta);
+                zoomTimeout = null;
+            }, 50);
+        }
+
+        zoomInBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleZoom(zoomStep);
+        });
+        zoomOutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleZoom(-zoomStep);
+        });
 
         fullscreenBtn.addEventListener('click', () => {
             if (!document.fullscreenElement) {
@@ -149,14 +171,13 @@
         });
 
         closeBtn.addEventListener('click', () => {
-            // You can define what happens when the close button is clicked
-            // For example, you might want to hide the viewer or navigate away
-            alert('Close button clicked. Define your close behavior here.');
+            // Close the viewer by navigating back to the previous page
+            window.history.back();
         });
 
         image.addEventListener('wheel', (e) => {
             e.preventDefault();
-            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            const delta = e.deltaY > 0 ? -zoomStep : zoomStep;
             zoom(delta);
         });
 
