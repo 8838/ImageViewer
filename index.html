@@ -11,28 +11,14 @@
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
-        h1 {
-            position: sticky;
-            top: 0;
-            width: 100%;
-            text-align: center;
-            margin: 0;
-            font-size: 24px;
-            color: #800080; /* 紫色标题 */
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-            z-index: 10;
-        }
         #mediaContainer {
-            flex-grow: 1;
             width: 100%;
             max-width: 90%;
-            max-height: calc(100vh - 60px);
+            height: 100vh;
             overflow: auto;
             display: flex;
             justify-content: center;
@@ -43,11 +29,11 @@
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            display: none; /* 初始时隐藏图片 */
+            display: none; /* Initially hide the image */
         }
         .loading {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #800080; /* 紫色动画 */
+            border-top: 4px solid #800080; /* Purple animation */
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -61,7 +47,6 @@
     </style>
 </head>
 <body>
-    <h1>Image viewer</h1>
     <div id="mediaContainer">
         <div class="loading"></div>
         <img id="image" alt="Image viewer">
@@ -71,12 +56,11 @@
         const mediaUrl = `https://i.imgs.ovh${path}`;
         const imgElement = document.getElementById('image');
         const loadingSpinner = document.querySelector('.loading');
-
-        // 设置图片的 src 属性并处理加载完成事件
+        // Set the image src and handle the load event
         imgElement.src = mediaUrl;
         imgElement.onload = () => {
-            loadingSpinner.style.display = 'none'; // 隐藏加载动画
-            imgElement.style.display = 'block';    // 显示图片
+            loadingSpinner.style.display = 'none'; // Hide loading animation
+            imgElement.style.display = 'block';    // Show the image
         };
     </script>
 </body>
