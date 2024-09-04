@@ -10,18 +10,26 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f0f0;
         }
-        #viewer {
+        #underlying-image {
             width: 100%;
             height: 100%;
-            display: flex;
+            object-fit: contain;
+            cursor: pointer;
+        }
+        #viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
             justify-content: center;
             align-items: center;
             background-color: rgba(0, 0, 0, 0.9);
-            position: relative;
+            z-index: 1000;
         }
         #image-container {
             max-width: 90%;
@@ -93,6 +101,7 @@
     </style>
 </head>
 <body>
+    <img id="underlying-image" src="" alt="Underlying image">
     <div id="viewer">
         <div id="image-container">
             <img id="image" src="" alt="Viewed image">
@@ -107,6 +116,7 @@
     </div>
 
     <script>
+        const underlyingImage = document.getElementById('underlying-image');
         const image = document.getElementById('image');
         const viewer = document.getElementById('viewer');
         const imageContainer = document.getElementById('image-container');
@@ -119,6 +129,7 @@
         // Set image source
         const path = window.location.pathname;
         const mediaUrl = `https://i.imgs.ovh${path}`;
+        underlyingImage.src = mediaUrl;
         image.src = mediaUrl;
 
         let scale = 1;
@@ -162,18 +173,40 @@
 
         fullscreenBtn.addEventListener('click', () => {
             if (!document.fullscreenElement) {
-                viewer.requestFullscreen().catch(err => {
-                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-                });
+                if (viewer.requestFullscreen) {
+                    viewer.requestFullscreen();
+                } else if (viewer.mozRequestFullScreen) {
+                    viewer.mozRequestFullScreen();
+                } else if (viewer.webkitRequestFullscreen) {
+                    viewer.webkitRequestFullscreen();
+                } else if (viewer.msRequestFullscreen) {
+                    viewer.msRequestFullscreen();
+                }
             } else {
-                document.exitFullscreen();
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
             }
         });
 
-        closeBtn.addEventListener('click', () => {
-            // Close the viewer by navigating back to the previous page
-            window.history.back();
-        });
+        function showViewer() {
+            viewer.style.display = 'flex';
+            underlyingImage.style.display = 'none';
+        }
+
+        function hideViewer() {
+            viewer.style.display = 'none';
+            underlyingImage.style.display = 'block';
+        }
+
+        closeBtn.addEventListener('click', hideViewer);
+        underlyingImage.addEventListener('click', showViewer);
 
         image.addEventListener('wheel', (e) => {
             e.preventDefault();
@@ -204,6 +237,9 @@
             translateY = 0;
             updateTransform();
         });
+
+        // Initially show the underlying image
+        hideViewer();
     </script>
 </body>
 </html>
