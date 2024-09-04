@@ -11,28 +11,31 @@
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
             display: flex;
-            justify-content: center;
-            align-items: center;
             flex-direction: column;
+            align-items: center;
             min-height: 100vh;
-            overflow: hidden;
         }
         h1 {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            text-align: center;
             margin: 0;
             font-size: 24px;
             background-color: rgba(255, 255, 255, 0.8);
             padding: 10px;
-            border-radius: 5px;
+            border-bottom: 1px solid #ccc;
             z-index: 10;
         }
         #mediaContainer {
+            flex-grow: 1;
+            width: 100%;
             max-width: 90%;
-            max-height: 90vh;
-            margin-top: 60px; /* To create space for the title */
+            max-height: calc(100vh - 60px);
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         #mediaContainer img {
             max-width: 100%;
